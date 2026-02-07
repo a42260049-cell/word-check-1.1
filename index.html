@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>全商情報処理1級 バトルクイズ</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(#222, #444);
+  color: white;
+  text-align: center;
+}
+
+#game {
+  max-width: 720px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #333;
+  border-radius: 12px;
+}
+
+#enemy img {
+  width: 150px;
+}
+
+.hp-bar {
+  width: 80%;
+  height: 25px;
+  border: 2px solid #fff;
+  margin: 10px auto;
+  background: #555;
+}
+.hp-inner {
+  height: 100%;
+  background: linear-gradient(red, darkred);
+  width: 100%;
+  transition: width 0.4s;
+}
+
+.option {
+  width: 80%;
+  padding: 10px;
+  margin: 8px auto;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  background: #666;
+  color: white;
+}
+.option:hover { background: #888; }
+
+.option.correct {
+  background: #2ecc71 !important;
+}
+.option.wrong {
+  background: #e74c3c !important;
+}
+
+#message {
+  margin-top: 15px;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+.correct-text { color: #2ecc71; }
+.wrong-text { color: #e74c3c; }
+
+#nextBtn {
+  display: none;
+  margin: 20px auto;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #3498db;
+  color: white;
+}
+
+#result {
+  display: none;
+  text-align: left;
+  background: #222;
+  padding: 15px;
+  border-radius: 10px;
+}
+.rank { text-align: center; font-size: 1.4em; font-weight: bold; }
+.rank-s { color: gold; }
+.rank-a { color: lime; }
+.rank-b { color: deepskyblue; }
+.rank-c { color: crimson; }
+</style>
+</head>
+
+<body>
+<div id="game">
+  <h1>正解を選んで敵を倒せ！</h1>
+
+  <div id="enemy">
+    <img id="enemyImg" src="">
+  </div>
+
+  <div class="hp-bar">
+    <div id="enemyHP" class="hp-inner"></div>
+  </div>
+
+  <div id="quiz">
+    <p id="question"></p>
+    <div id="options"></div>
+  </div>
+
+  <p id="message"></p>
+  <button id="nextBtn">次へ</button>
+
+  <div id="result"></div>
+</div>
+
+<script>
+// 敵画像
+const enemyImages = [
+  "kaseijin_green.png",
+  "kaseijin_purple.png",
+  "kaseijin_red.png"
+];
+
+// 問題（例：最低15問以上推奨）
+const allQuestions = [
+  { q:"前の工程に戻らない開発工程", options:["ウォータフォールモデル","スパイラルモデル","プロトタイピングモデル","アジャイル"], answerIndex:0 },
+  { q:"OSの役割はどれか", options:["表計算","資源管理","文書作成","画像編集"], answerIndex:1 },
+  { q:"主記憶装置はどれか", options:["HDD","SSD","RAM","DVD"], answerIndex:2 },
+  { q:"2進数1011は10進数でいくつ", options:["9","10","11","12"], answerIndex:2 },
+  { q:"LANの正式名称", options:["Local Area Network","Large Access Network","Long Area Network","Light Area Network"], answerIndex:0 },
+];
+
+const questions = [...allQuestions];
+let currentQuestionIndex = 0;
+
+// 敵管理
+let enemyIndex = 0;
+let enemyMaxHP = 5;
+let enemyHP = enemyMaxHP;
+
+// 成績
+let correctCount = 0;
+let wrongList = [];
+
+function setEnemy(){
+  if(enemyIndex >= enemyImages.length){
+    showResult();
+    return;
+  }
+  document.getElementById("enemyImg").src = enemyImages[enemyIndex];
+  enemyHP = enemyMaxHP;
+  updateHP();
+}
+
+function updateHP(){
+  document.getElementById("enemyHP").style.width =
+    (enemyHP / enemyMaxHP * 100) + "%";
+}
+
+function showQuestion(){
+  const q = questions[currentQuestionIndex];
+  document.getElementById("question").textContent = q.q;
+  document.getElementById("message").textContent = "";
+  document.getElementById("nextBtn").style.display = "none";
+
+  const optionsDiv = document.getElementById("options");
+  optionsDiv.innerHTML = "";
+
+  q.options.forEach((opt,i)=>{
+    const btn = document.createElement("button");
+    btn.textContent = opt;
+    btn.className = "option";
+    btn.onclick = ()=>checkAnswer(i,btn);
+    optionsDiv.appendChild(btn);
+  });
+}
+
+function checkAnswer(selected, btn){
+  const q = questions[currentQuestionIndex];
+  const buttons = document.querySelectorAll(".option");
+
+  buttons.forEach(b=>b.disabled=true);
+  buttons[q.answerIndex].classList.add("correct");
+
+  if(selected === q.answerIndex){
+    btn.classList.add("correct");
+    document.getElementById("message").innerHTML =
+      `<span class="correct-text">⭕ 正解！</span><br>正解：${q.options[q.answerIndex]}`;
+    correctCount++;
+    enemyHP--;
+    updateHP();
+  } else {
+    btn.classList.add("wrong");
+    document.getElementById("message").innerHTML =
+      `<span class="wrong-text">❌ 不正解…</span><br>正解：${q.options[q.answerIndex]}`;
+
+    if(!wrongList.some(w=>w.question===q.q)){
+      wrongList.push({question:q.q, correct:q.options[q.answerIndex]});
+    }
+  }
+
+  document.getElementById("nextBtn").style.display = "block";
+}
+
+document.getElementById("nextBtn").onclick = ()=>{
+  if(enemyHP <= 0){
+    enemyIndex++;
+    setEnemy();
+  }
+
+  currentQuestionIndex++;
+  if(currentQuestionIndex >= questions.length){
+    showResult();
+  } else {
+    showQuestion();
+  }
+};
+
+function showResult(){
+  document.getElementById("quiz").style.display="none";
+  document.getElementById("enemy").style.display="none";
+  document.querySelector(".hp-bar").style.display="none";
+  document.getElementById("nextBtn").style.display="none";
+
+  const result = document.getElementById("result");
+  result.style.display="block";
+
+  const rate = correctCount / questions.length * 100;
+  let rank="C", cls="rank-c";
+  if(rate>=95){rank="S";cls="rank-s";}
+  else if(rate>=70){rank="A";cls="rank-a";}
+  else if(rate>=50){rank="B";cls="rank-b";}
+
+  result.innerHTML = `
+    <h2>成績発表</h2>
+    <p>正解数：${correctCount}/${questions.length}</p>
+    <div class="rank ${cls}">${rank}ランク</div>
+  `;
+
+  if(wrongList.length){
+    result.innerHTML += "<h3>復習</h3>";
+    wrongList.forEach(w=>{
+      result.innerHTML += `<p>Q:${w.question}<br>正解:${w.correct}</p>`;
+    });
+  }
+}
+
+setEnemy();
+showQuestion();
+</script>
+</body>
+</html>
