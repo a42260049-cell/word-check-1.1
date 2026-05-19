@@ -1,104 +1,183 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<title>全商情報処理1級 バトルクイズ</title>
+  <meta charset="UTF-8">
+  <title>RPG風クイズゲーム</title>
 
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background: linear-gradient(#222, #444);
-  color: white;
-  text-align: center;
-}
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: "Arial", sans-serif;
+      text-align: center;
+      background: linear-gradient(#222, #444);
+      color: white;
+    }
 
-#game {
-  max-width: 720px;
-  margin: 20px auto;
-  padding: 20px;
-  background: #333;
-  border-radius: 12px;
-}
+    #game {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+      background: #333;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.7);
+    }
 
-#enemy img {
-  width: 150px;
-}
+    h1 {
+      margin-top: 0;
+    }
 
-.hp-bar {
-  width: 80%;
-  height: 25px;
-  border: 2px solid #fff;
-  margin: 10px auto;
-  background: #555;
-}
-.hp-inner {
-  height: 100%;
-  background: linear-gradient(red, darkred);
-  width: 100%;
-  transition: width 0.4s;
-}
+    #enemy {
+      margin: 20px 0;
+    }
 
-.option {
-  width: 80%;
-  padding: 10px;
-  margin: 8px auto;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  background: #666;
-  color: white;
-}
-.option:hover { background: #888; }
+    #enemy img {
+      width: 180px;
+      height: 180px;
+      object-fit: contain;
+    }
 
-.option.correct {
-  background: #2ecc71 !important;
-}
-.option.wrong {
-  background: #e74c3c !important;
-}
+    .enemy-name {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
 
-#message {
-  margin-top: 15px;
-  font-size: 1.1em;
-  font-weight: bold;
-}
-.correct-text { color: #2ecc71; }
-.wrong-text { color: #e74c3c; }
+    .hp-bar {
+      width: 80%;
+      height: 25px;
+      border: 2px solid white;
+      border-radius: 8px;
+      margin: 10px auto;
+      background: #555;
+      overflow: hidden;
+    }
 
-#nextBtn {
-  display: none;
-  margin: 20px auto;
-  padding: 10px 20px;
-  font-size: 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  background: #3498db;
-  color: white;
-}
+    .hp-inner {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(to right, #ff0000, #aa0000);
+      transition: width 0.4s;
+    }
 
-#result {
-  display: none;
-  text-align: left;
-  background: #222;
-  padding: 15px;
-  border-radius: 10px;
-}
-.rank { text-align: center; font-size: 1.4em; font-weight: bold; }
-.rank-s { color: gold; }
-.rank-a { color: lime; }
-.rank-b { color: deepskyblue; }
-.rank-c { color: crimson; }
-</style>
+    #question {
+      font-size: 24px;
+      margin: 25px 0;
+      line-height: 1.7;
+    }
+
+    .option {
+      display: block;
+      width: 85%;
+      margin: 12px auto;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      background: #666;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .option:hover {
+      background: #888;
+      transform: scale(1.02);
+    }
+
+    #message {
+      margin-top: 20px;
+      font-size: 20px;
+      min-height: 80px;
+      line-height: 1.8;
+    }
+
+    #scoreArea {
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+
+    #result {
+      display: none;
+      margin-top: 20px;
+      text-align: left;
+      background: #222;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    #result h2 {
+      text-align: center;
+    }
+
+    .mistake {
+      background: #444;
+      margin: 10px 0;
+      padding: 12px;
+      border-radius: 8px;
+      line-height: 1.6;
+    }
+
+    .rank {
+      text-align: center;
+      font-size: 30px;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+
+    .rank-s { color: gold; }
+    .rank-a { color: limegreen; }
+    .rank-b { color: deepskyblue; }
+    .rank-c { color: crimson; }
+
+    #retryBtn {
+      display: block;
+      margin: 25px auto 10px;
+      padding: 15px 30px;
+      font-size: 20px;
+      border: none;
+      border-radius: 10px;
+      background: #e11d48;
+      color: white;
+      cursor: pointer;
+    }
+
+    #retryBtn:hover {
+      background: #be123c;
+    }
+
+    /* 問題文強調用 */
+    .keyword {
+      color: yellow;
+      font-weight: bold;
+      font-size: 1.15em;
+    }
+
+    .important {
+      color: #ff8080;
+      font-weight: bold;
+    }
+  </style>
 </head>
 
 <body>
+
 <div id="game">
-  <h1>正解を選んで敵を倒せ！</h1>
+
+  <h1>🎮 RPG風クイズゲーム</h1>
+
+  <div id="scoreArea">
+    ポイント: <span id="scoreText">0</span>
+  </div>
 
   <div id="enemy">
+
+    <div class="enemy-name" id="enemyName">
+      宇宙人
+    </div>
+
     <img id="enemyImg" src="">
+
   </div>
 
   <div class="hp-bar">
@@ -110,146 +189,414 @@ body {
     <div id="options"></div>
   </div>
 
-  <p id="message"></p>
-  <button id="nextBtn">次へ</button>
+  <div id="message"></div>
 
   <div id="result"></div>
+
 </div>
 
 <script>
-// 敵画像
-const enemyImages = [
-  "kaseijin_green.png",
-  "kaseijin_purple.png",
-  "kaseijin_red.png"
-];
 
-// 問題（例：最低15問以上推奨）
-const allQuestions = [
-  { q:"前の工程に戻らない開発工程", options:["ウォータフォールモデル","スパイラルモデル","プロトタイピングモデル","アジャイル"], answerIndex:0 },
-  { q:"OSの役割はどれか", options:["表計算","資源管理","文書作成","画像編集"], answerIndex:1 },
-  { q:"主記憶装置はどれか", options:["HDD","SSD","RAM","DVD"], answerIndex:2 },
-  { q:"2進数1011は10進数でいくつ", options:["9","10","11","12"], answerIndex:2 },
-  { q:"LANの正式名称", options:["Local Area Network","Large Access Network","Long Area Network","Light Area Network"], answerIndex:0 },
-];
+  // =========================
+  // 敵データ
+  // =========================
 
-const questions = [...allQuestions];
-let currentQuestionIndex = 0;
-
-// 敵管理
-let enemyIndex = 0;
-let enemyMaxHP = 5;
-let enemyHP = enemyMaxHP;
-
-// 成績
-let correctCount = 0;
-let wrongList = [];
-
-function setEnemy(){
-  if(enemyIndex >= enemyImages.length){
-    showResult();
-    return;
-  }
-  document.getElementById("enemyImg").src = enemyImages[enemyIndex];
-  enemyHP = enemyMaxHP;
-  updateHP();
-}
-
-function updateHP(){
-  document.getElementById("enemyHP").style.width =
-    (enemyHP / enemyMaxHP * 100) + "%";
-}
-
-function showQuestion(){
-  const q = questions[currentQuestionIndex];
-  document.getElementById("question").textContent = q.q;
-  document.getElementById("message").textContent = "";
-  document.getElementById("nextBtn").style.display = "none";
-
-  const optionsDiv = document.getElementById("options");
-  optionsDiv.innerHTML = "";
-
-  q.options.forEach((opt,i)=>{
-    const btn = document.createElement("button");
-    btn.textContent = opt;
-    btn.className = "option";
-    btn.onclick = ()=>checkAnswer(i,btn);
-    optionsDiv.appendChild(btn);
-  });
-}
-
-function checkAnswer(selected, btn){
-  const q = questions[currentQuestionIndex];
-  const buttons = document.querySelectorAll(".option");
-
-  buttons.forEach(b=>b.disabled=true);
-  buttons[q.answerIndex].classList.add("correct");
-
-  if(selected === q.answerIndex){
-    btn.classList.add("correct");
-    document.getElementById("message").innerHTML =
-      `<span class="correct-text">⭕ 正解！</span><br>正解：${q.options[q.answerIndex]}`;
-    correctCount++;
-    enemyHP--;
-    updateHP();
-  } else {
-    btn.classList.add("wrong");
-    document.getElementById("message").innerHTML =
-      `<span class="wrong-text">❌ 不正解…</span><br>正解：${q.options[q.answerIndex]}`;
-
-    if(!wrongList.some(w=>w.question===q.q)){
-      wrongList.push({question:q.q, correct:q.options[q.answerIndex]});
+  const enemies = [
+    {
+      name: "緑の宇宙人",
+      image: "kaseijin_green.png"
+    },
+    {
+      name: "紫の宇宙人",
+      image: "kaseijin_purple.png"
+    },
+    {
+      name: "赤の宇宙人",
+      image: "kaseijin_red.png"
     }
-  }
+  ];
 
-  document.getElementById("nextBtn").style.display = "block";
-}
+  // =========================
+  // 問題データ
+  // =========================
 
-document.getElementById("nextBtn").onclick = ()=>{
-  if(enemyHP <= 0){
-    enemyIndex++;
+  const allQuestions = [
+
+    {
+      q: "HTMLの頭文字 <span class='keyword'>H</span> は何の略？",
+      options: ["Hyper", "High", "Home", "Horse"],
+      answerIndex: 0
+    },
+
+    {
+      q: "<span class='keyword'>JavaScript</span>で数値の足し算をする演算子は？",
+      options: ["-", "+", "*", "/"],
+      answerIndex: 1
+    },
+
+    {
+      q: "コンピュータの基本3要素は？",
+      options: ["入力・出力・処理", "CPU・GPU・RAM", "HDD・SSD・USB", "電源・冷却・ケース"],
+      answerIndex: 0
+    },
+
+    {
+      q: "<span class='keyword'>CSS</span>で文字色を指定するプロパティは？",
+      options: ["font", "color", "background", "style"],
+      answerIndex: 1
+    },
+
+    {
+      q: "<span class='important'>HTML</span>で改行を表すタグは？",
+      options: ["<break>", "<lb>", "<br>", "<hr>"],
+      answerIndex: 2
+    },
+
+    {
+      q: "情報処理で『0か1か』を扱う単位は？",
+      options: ["byte", "bit", "kb", "mb"],
+      answerIndex: 1
+    },
+
+    {
+      q: "ネットワークで <span class='keyword'>IP</span> は何の略？",
+      options: ["Internet Protocol", "Inside Program", "Instant Port", "Input Process"],
+      answerIndex: 0
+    },
+
+    {
+      q: "HTMLでリンクを貼るタグは？",
+      options: ["<a>", "<link>", "<p>", "<href>"],
+      answerIndex: 0
+    },
+
+    {
+      q: "<span class='keyword'>JavaScript</span>で条件分岐に使う文は？",
+      options: ["if", "switch", "case", "すべて"],
+      answerIndex: 3
+    },
+
+    {
+      q: "『RAM』の正式名称は？",
+      options: [
+        "Random Access Memory",
+        "Read All Memory",
+        "Rapid Access Module",
+        "Real Application Machine"
+      ],
+      answerIndex: 0
+    },
+
+    {
+      q: "Webページの見た目を整えるのは？",
+      options: ["HTML", "CSS", "JavaScript", "Python"],
+      answerIndex: 1
+    },
+
+    {
+      q: "<span class='keyword'>JavaScript</span>で繰り返し処理を行う文は？",
+      options: ["for", "repeat", "loop", "iterate"],
+      answerIndex: 0
+    }
+
+  ];
+
+  // =========================
+  // ゲーム変数
+  // =========================
+
+  let questions;
+  let currentQuestionIndex;
+
+  let enemyIndex;
+  let enemyMaxHP;
+  let enemyHP;
+
+  let correctCount;
+  let wrongList;
+  let score;
+
+  // =========================
+  // ゲーム開始
+  // =========================
+
+  function startGame() {
+
+    // ランダム問題
+    questions = [...allQuestions]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 15);
+
+    currentQuestionIndex = 0;
+
+    enemyIndex = 0;
+
+    enemyMaxHP = 5;
+    enemyHP = enemyMaxHP;
+
+    correctCount = 0;
+    wrongList = [];
+
+    score = 0;
+
+    document.getElementById("scoreText").textContent = score;
+
+    document.getElementById("result").style.display = "none";
+
+    document.getElementById("quiz").style.display = "block";
+    document.getElementById("enemy").style.display = "block";
+
+    document.querySelector(".hp-bar").style.display = "block";
+
+    document.getElementById("message").style.display = "block";
+
     setEnemy();
-  }
 
-  currentQuestionIndex++;
-  if(currentQuestionIndex >= questions.length){
-    showResult();
-  } else {
     showQuestion();
   }
-};
 
-function showResult(){
-  document.getElementById("quiz").style.display="none";
-  document.getElementById("enemy").style.display="none";
-  document.querySelector(".hp-bar").style.display="none";
-  document.getElementById("nextBtn").style.display="none";
+  // =========================
+  // 敵セット
+  // =========================
 
-  const result = document.getElementById("result");
-  result.style.display="block";
+  function setEnemy() {
 
-  const rate = correctCount / questions.length * 100;
-  let rank="C", cls="rank-c";
-  if(rate>=95){rank="S";cls="rank-s";}
-  else if(rate>=70){rank="A";cls="rank-a";}
-  else if(rate>=50){rank="B";cls="rank-b";}
+    if (enemyIndex >= enemies.length) {
+      showResult();
+      return;
+    }
 
-  result.innerHTML = `
-    <h2>成績発表</h2>
-    <p>正解数：${correctCount}/${questions.length}</p>
-    <div class="rank ${cls}">${rank}ランク</div>
-  `;
+    const enemy = enemies[enemyIndex];
 
-  if(wrongList.length){
-    result.innerHTML += "<h3>復習</h3>";
-    wrongList.forEach(w=>{
-      result.innerHTML += `<p>Q:${w.question}<br>正解:${w.correct}</p>`;
-    });
+    document.getElementById("enemyImg").src = enemy.image;
+
+    document.getElementById("enemyName").textContent = enemy.name;
+
+    enemyHP = enemyMaxHP;
+
+    updateHP();
   }
-}
 
-setEnemy();
-showQuestion();
+  // =========================
+  // HP更新
+  // =========================
+
+  function updateHP() {
+
+    const percent = (enemyHP / enemyMaxHP) * 100;
+
+    document.getElementById("enemyHP").style.width =
+      percent + "%";
+  }
+
+  // =========================
+  // 問題表示
+  // =========================
+
+  function showQuestion() {
+
+    if (currentQuestionIndex >= questions.length) {
+      showResult();
+      return;
+    }
+
+    const q = questions[currentQuestionIndex];
+
+    // HTML装飾対応
+    document.getElementById("question").innerHTML = q.q;
+
+    const optionsDiv =
+      document.getElementById("options");
+
+    optionsDiv.innerHTML = "";
+
+    q.options.forEach((opt, i) => {
+
+      const btn = document.createElement("button");
+
+      btn.innerHTML = opt;
+
+      btn.className = "option";
+
+      btn.onclick = () => checkAnswer(i);
+
+      optionsDiv.appendChild(btn);
+
+    });
+
+  }
+
+  // =========================
+  // 回答チェック
+  // =========================
+
+  function checkAnswer(selected) {
+
+    const q = questions[currentQuestionIndex];
+
+    if (selected === q.answerIndex) {
+
+      enemyHP--;
+
+      updateHP();
+
+      correctCount++;
+
+      score += 10;
+
+      document.getElementById("scoreText").textContent =
+        score;
+
+      document.getElementById("message").innerHTML =
+        `⭕ 正解！<br>
+         正解は「${q.options[q.answerIndex]}」<br>
+         <span class="keyword">+10ポイント！</span><br>
+         現在のポイント: ${score}`;
+
+      // 敵撃破
+      if (enemyHP <= 0) {
+
+        document.getElementById("message").innerHTML +=
+          "<br><br><span class='important'>敵を倒した！</span>";
+
+        enemyIndex++;
+
+        setEnemy();
+      }
+
+    } else {
+
+      document.getElementById("message").innerHTML =
+        `❌ 不正解！<br>
+         正解は
+         <span class='keyword'>
+         ${q.options[q.answerIndex]}
+         </span>`;
+
+      wrongList.push({
+        question: q.q,
+        correct: q.options[q.answerIndex]
+      });
+
+    }
+
+    currentQuestionIndex++;
+
+    setTimeout(() => {
+
+      if (currentQuestionIndex >= questions.length) {
+        showResult();
+      } else {
+        showQuestion();
+      }
+
+    }, 1500);
+
+  }
+
+  // =========================
+  // 成績表示
+  // =========================
+
+  function showResult() {
+
+    document.getElementById("quiz").style.display =
+      "none";
+
+    document.getElementById("enemy").style.display =
+      "none";
+
+    document.querySelector(".hp-bar").style.display =
+      "none";
+
+    document.getElementById("message").style.display =
+      "none";
+
+    const resultDiv =
+      document.getElementById("result");
+
+    resultDiv.style.display = "block";
+
+    const scorePercent =
+      (correctCount / questions.length) * 100;
+
+    let rankClass = "rank-c";
+    let rankText = "Cランク…もっと頑張ろう！";
+
+    if (scorePercent >= 90) {
+      rankClass = "rank-s";
+      rankText = "Sランク！完璧！✨";
+    }
+    else if (scorePercent >= 70) {
+      rankClass = "rank-a";
+      rankText = "Aランク！素晴らしい！";
+    }
+    else if (scorePercent >= 50) {
+      rankClass = "rank-b";
+      rankText = "Bランク！あと少し！";
+    }
+
+    resultDiv.innerHTML = `
+      <h2>成績発表</h2>
+
+      <p>正解数: ${correctCount} / ${questions.length}</p>
+
+      <p>ポイント: ${score}</p>
+
+      <p class="rank ${rankClass}">
+        ${rankText}
+      </p>
+    `;
+
+    // 間違えた問題
+    if (wrongList.length > 0) {
+
+      resultDiv.innerHTML +=
+        "<h3>間違えた問題を復習しよう！</h3>";
+
+      wrongList.forEach(item => {
+
+        resultDiv.innerHTML += `
+          <div class="mistake">
+            <strong>Q:</strong>
+            ${item.question}
+            <br>
+
+            <strong>正解:</strong>
+            <span class="keyword">
+              ${item.correct}
+            </span>
+          </div>
+        `;
+
+      });
+
+    } else {
+
+      resultDiv.innerHTML +=
+        "<p>🎉 全問正解！素晴らしい！ 🎉</p>";
+
+    }
+
+    // リトライボタン
+    resultDiv.innerHTML += `
+      <button id="retryBtn">
+        もう一度挑戦
+      </button>
+    `;
+
+    document
+      .getElementById("retryBtn")
+      .onclick = startGame;
+  }
+
+  // =========================
+  // 開始
+  // =========================
+
+  startGame();
+
 </script>
+
 </body>
 </html>
